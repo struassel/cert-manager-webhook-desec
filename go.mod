@@ -1,4 +1,4 @@
-module github.com/cert-manager/webhook-example
+module github.com/struassel/cert-manager-webhook-desec
 
 go 1.22.0
 
