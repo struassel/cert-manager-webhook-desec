@@ -17,3 +17,8 @@ cert-manager-webhook-desec
 # Make artifacts
 _out
 _test
+
+# Ignore test data
+testdata/desec-solver/secret.yaml
+
+.vscode

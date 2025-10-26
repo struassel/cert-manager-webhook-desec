@@ -1,0 +1,38 @@
+name: 'Retrieve Go dependencies'
+description: 'Retrieve Go dependencies and submit using GitHub submission API'
+
+inputs:
+  mod:
+    description: 'go.mod file'
+    required: false
+    default: "go.mod"
+  target:
+    description: 'Build target'
+    required: false
+    default: 'main.go'
+runs:
+  using: "composite"
+  steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v5
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: ">=1.25.1"
+
+    - name: Run snapshot action
+      uses: actions/go-dependency-submission@v2
+      env:
+        GOPROXY: ''
+        GOPRIVATE: ''
+      with:
+          # Required: Define the repo path to the go.mod file used by the
+          # build target
+          go-mod-path: ${{ inputs.mod }}
+          #
+          # Optional. Define the repo path of a build target,
+          # a file with a `main()` function.
+          # If undefined, this action will collect all dependencies
+          # used by all build targets for the module. This may
+          # include Go dependencies used by tests and tooling.
+          go-build-target: ${{ inputs.target }}

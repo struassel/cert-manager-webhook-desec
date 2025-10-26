@@ -1,0 +1,33 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  # Maintain dependencies for Go Modules and the Go version itself
+  - package-ecosystem: "gomod"
+    directory: "/" # Location of your go.mod file
+    schedule:
+      interval: "daily" # How often to check for updates
+    commit-message:
+      prefix: "Go update"
+      include: "scope"
+
+  # Maintain dependencies for Docker
+  - package-ecosystem: "docker"
+    directory: "/" # Location of your Dockerfile
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "Docker image update"
+      include: "scope"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of your workflow files
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "Github actions"
+      include: "scope"

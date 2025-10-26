@@ -1,0 +1,130 @@
+name: Release Image and Chart
+
+on:
+  push:
+    tags:
+    - 'v*.*.*'
+    - 'v*.*.*-rc*'
+
+jobs:
+  list-dependencies:
+    name: List dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    - name: List dependencies
+      uses: ./.github/actions/go-dependencies
+
+  build-and-publish-image:
+    name: Build and Publish Docker Image
+    runs-on: ubuntu-latest
+    # Grant permissions to write to the GitHub Packages registry
+    permissions:
+      contents: read
+      packages: write
+
+    # Outputs of this job, which can be used by other jobs
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+
+    steps:
+    # 1. Check out the repository code
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    # 2. Extract metadata (tags, labels) for Docker
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+        flavor: |
+          latest=auto
+
+    # 3. Build and Push Docker Image using the composite action
+    - name: Build and Push Docker Image
+      uses: ./.github/actions/build-image
+      with:
+        tags: ${{ steps.meta.outputs.tags }}
+        push: true
+        registry_username: ${{ github.actor }}
+        registry_password: ${{ secrets.GITHUB_TOKEN }}
+
+  # This job packages and publishes the Helm chart
+  publish-chart:
+    name: Build and Publish Helm Chart
+    runs-on: ubuntu-latest
+    needs: build-and-publish-image # This job depends on the previous ones
+    # Grant permissions to write to the repository contents (for gh-pages branch)
+    permissions:
+      contents: write
+      pages: write
+      packages: write
+
+    steps:
+    # 1. Check out the repository code
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0 # Fetches all history for git actions
+
+    # 2. Install yq to edit YAML files
+    - name: Install yq
+      uses: mikefarah/yq@v4.47.2
+
+    # 3. Update the values.yaml with the new image tag and chart version
+    # It takes the version from the output of the build-and-publish-image job
+    - name: Update Helm chart values
+      run: |
+        IMAGE_TAG=${{ needs.build-and-publish-image.outputs.image_tag }}
+        yq -i ".image.tag = \"$IMAGE_TAG\"" ./charts/desec-webhook/values.yaml
+        yq -i ".version = \"$IMAGE_TAG\"" ./charts/desec-webhook/Chart.yaml
+        yq -i ".appVersion = \"$IMAGE_TAG\"" ./charts/desec-webhook/Chart.yaml
+        echo "Updated values.yaml:"
+        cat ./charts/desec-webhook/values.yaml
+        echo "---"
+        echo "Updated Chart.yaml:"
+        cat ./charts/desec-webhook/Chart.yaml
+
+    # 4. Set up Helm
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: v3.13.0 # Specify a specific Helm version
+
+    # 5. Configure Git
+    - name: Configure Git
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+    # 6. Run chart-releaser
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.7.0
+      with:
+        packages_with_index: true
+      env:
+        CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        CR_RELEASE_NAME_TEMPLATE: "v{{ .Version }}"
+        CR_GENERATE_RELEASE_NOTES: true
+
+    # 7. Login to Github
+    - name: Login to GitHub Container Registry
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u ${{ github.actor }} --password-stdin ghcr.io
+
+    # 8. Push to GHCR
+    - name: Push Helm Chart to OCI Registry
+      run: |
+        shopt -s nullglob
+        for pkg in .cr-release-packages/*.tgz; do
+          if [ -n "${pkg:-}" ]; then
+            helm push "${pkg}" oci://ghcr.io/${{ github.repository_owner }}/helm-charts
+          fi
+        done

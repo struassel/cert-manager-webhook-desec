@@ -1,0 +1,6 @@
+{
+    "apiTokenRef": {
+        "name": "secret",
+        "key": "token"
+    }
+}

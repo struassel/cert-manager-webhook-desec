@@ -1,0 +1,41 @@
+name: Docker Image Build
+
+on:
+  push:
+    branches:
+    - '**'
+    paths:
+    - 'desec/**'
+    - 'go.*'
+    - '*.go'
+    - 'Dockerfile'
+  pull_request:
+    branches:
+    - '**'
+    paths:
+    - 'desec/**'
+    - 'go.*'
+    - '*.go'
+    - 'Dockerfile'
+  workflow_dispatch:
+
+
+jobs:
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Build Docker Image
+      uses: ./.github/actions/build-image
+      with:
+        tags: local-build:${{ github.sha }}
+        push: false
+
+    - name: List dependencies
+      uses: ./.github/actions/go-dependencies

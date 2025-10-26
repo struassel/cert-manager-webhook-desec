@@ -2,6 +2,7 @@ GO ?= $(shell which go)
 OS ?= $(shell $(GO) env GOOS)
 ARCH ?= $(shell $(GO) env GOARCH)
 OUT ?= $(shell pwd)/_out
+TEST ?= $(shell pwd)/_test
 KUBEBUILDER_VERSION ?= 1.28.0
 
 IMAGE_NAME := "ghcr.io/struassel/desec-webhook"
@@ -29,25 +30,35 @@ ifeq ($(DOCKER),none)
 	$(error "Neither podman nor docker is installed. Please install one to continue.")
 endif
 
-test: _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl
-	TEST_ASSET_ETCD=_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd \
-	TEST_ASSET_KUBE_APISERVER=_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver \
-	TEST_ASSET_KUBECTL=_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl \
+
+.PHONY: all
+all: build image chart
+
+test: $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl
+	TEST_ASSET_ETCD=$(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd \
+	TEST_ASSET_KUBE_APISERVER=$(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver \
+	TEST_ASSET_KUBECTL=$(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl \
 	$(GO) test -v .
 
-_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz: | _test
+$(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz: | $(TEST)
 	curl -fsSL https://go.kubebuilder.io/test-tools/$(KUBEBUILDER_VERSION)/$(OS)/$(ARCH) -o $@
 
-_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl: _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz | _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)
+$(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl: $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz | $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)
 	tar xfO $< kubebuilder/bin/$(notdir $@) > $@ && chmod +x $@
 
 .PHONY: clean
 clean:
-	rm -r _test $(OUT)
+	rm -rf $(TEST) $(OUT)
+
+.PHONY: image
+image:
+	$(DOCKER) build --arch $(ARCH) -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
 
 .PHONY: build
-build:
-	$(DOCKER) build --arch $(ARCH) -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
+build: $(OUT)/webhook
+
+$(OUT)/webhook: $(OUT)
+	CGO_ENABLED=0 go build -v -o $(OUT)/webhook -ldflags '-w -extldflags "-static"' .
 
 .PHONY: lint
 lint:
@@ -67,5 +78,5 @@ $(OUT)/rendered-manifest.yaml: $(HELM_FILES) | $(OUT)
             --set image.tag=$(IMAGE_TAG) \
             $(HELM_FOLDER) > $@
 
-_test $(OUT) _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH):
+$(TEST) $(OUT) $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH):
 	mkdir -p $@
