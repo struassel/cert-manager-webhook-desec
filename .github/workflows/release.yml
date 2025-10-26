@@ -76,7 +76,7 @@ jobs:
 
     # 2. Install yq to edit YAML files
     - name: Install yq
-      uses: mikefarah/yq@v4.47.2
+      uses: mikefarah/yq@v4.48.1
 
     # 3. Update the values.yaml with the new image tag and chart version
     # It takes the version from the output of the build-and-publish-image job
