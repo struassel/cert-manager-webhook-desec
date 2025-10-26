@@ -9,7 +9,7 @@ IMAGE_NAME := "ghcr.io/struassel/cert-manager-webhook-desec"
 IMAGE_TAG := "latest"
 CHART_NAME := "cert-manager-webhook-desec"
 
-HELM_FOLDER := "deploy/desec-webhook"
+HELM_FOLDER := "charts/desec-webhook"
 HELM_FILES := $(shell find $(HELM_FOLDER))
 
 TEST_ZONE_NAME ?= "example.com"
