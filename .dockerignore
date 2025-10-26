@@ -1,0 +1,19 @@
+# 1. Ignore everything
+*
+
+# 2. Re-include the files you want to keep
+!go.mod
+!go.sum
+!**/*.go
+
+# 3. Re-include all directories (so Docker can traverse them to find .go files)
+# This is the magic part! It un-ignores directories, but not the files *inside* them.
+!*/
+
+# 4. Re-ignore specific directories you definitely don't want
+# (like .git, which contains many files that aren't .go)
+.git/
+.vscode/
+.github/
+charts/
+testdata/
