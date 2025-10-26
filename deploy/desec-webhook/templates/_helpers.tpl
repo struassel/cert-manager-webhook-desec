@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "desec-webhook.name" -}}
+{{- define "cert-manager-webhook-desec.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "desec-webhook.fullname" -}}
+{{- define "cert-manager-webhook-desec.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,22 +27,28 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "desec-webhook.chart" -}}
+{{- define "cert-manager-webhook-desec.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "desec-webhook.selfSignedIssuer" -}}
-{{ printf "%s-selfsign" (include "desec-webhook.fullname" .) }}
+{{- define "cert-manager-webhook-desec.selfSignedIssuer" -}}
+{{ printf "%s-selfsign" (include "cert-manager-webhook-desec.fullname" .) }}
 {{- end -}}
 
-{{- define "desec-webhook.rootCAIssuer" -}}
-{{ printf "%s-ca" (include "desec-webhook.fullname" .) }}
+{{- define "cert-manager-webhook-desec.rootCAIssuer" -}}
+{{ printf "%s-ca" (include "cert-manager-webhook-desec.fullname" .) }}
 {{- end -}}
 
-{{- define "desec-webhook.rootCACertificate" -}}
-{{ printf "%s-ca" (include "desec-webhook.fullname" .) }}
+{{- define "cert-manager-webhook-desec.rootCACertificate" -}}
+{{ printf "%s-ca" (include "cert-manager-webhook-desec.fullname" .) }}
 {{- end -}}
 
-{{- define "desec-webhook.servingCertificate" -}}
-{{ printf "%s-webhook-tls" (include "desec-webhook.fullname" .) }}
+{{- define "cert-manager-webhook-desec.servingCertificate" -}}
+{{ printf "%s-webhook-tls" (include "cert-manager-webhook-desec.fullname" .) }}
+{{- end -}}
+
+
+{{- define "cert-manager-webhook-desec.secretName" -}}
+{{- $secretName := print (include "cert-manager-webhook-desec.fullname" .) "-secret" -}}
+{{- default $secretName (.Values.secret.name) -}}
 {{- end -}}

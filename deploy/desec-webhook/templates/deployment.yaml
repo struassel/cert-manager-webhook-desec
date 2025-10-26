@@ -1,26 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "desec-webhook.name" . }}
+      app: {{ include "cert-manager-webhook-desec.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ include "desec-webhook.name" . }}
+        app: {{ include "cert-manager-webhook-desec.name" . }}
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "desec-webhook.fullname" . }}
+      serviceAccountName: {{ include "cert-manager-webhook-desec.fullname" . }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -54,7 +58,7 @@ spec:
       volumes:
         - name: certs
           secret:
-            secretName: {{ include "desec-webhook.servingCertificate" . }}
+            secretName: {{ include "cert-manager-webhook-desec.servingCertificate" . }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

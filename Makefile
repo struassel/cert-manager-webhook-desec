@@ -5,7 +5,7 @@ OUT ?= $(shell pwd)/_out
 TEST ?= $(shell pwd)/_test
 KUBEBUILDER_VERSION ?= 1.28.0
 
-IMAGE_NAME := "ghcr.io/struassel/desec-webhook"
+IMAGE_NAME := "ghcr.io/struassel/cert-manager-webhook-desec"
 IMAGE_TAG := "latest"
 CHART_NAME := "cert-manager-webhook-desec"
 
@@ -46,6 +46,10 @@ $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz: | $(TEST)
 $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl: $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH).tar.gz | $(TEST)/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)
 	tar xfO $< kubebuilder/bin/$(notdir $@) > $@ && chmod +x $@
 
+.PHONY: upgrade_deps
+upgrade_deps: 
+	$(GO) get -u ./... && $(GO) mod tidy
+
 .PHONY: clean
 clean:
 	rm -rf $(TEST) $(OUT)
@@ -58,7 +62,7 @@ image:
 build: $(OUT)/webhook
 
 $(OUT)/webhook: $(OUT)
-	CGO_ENABLED=0 go build -v -o $(OUT)/webhook -ldflags '-w -extldflags "-static"' .
+	CGO_ENABLED=0 $(GO) build -v -o $(OUT)/webhook -ldflags '-w -extldflags "-static"' .
 
 .PHONY: lint
 lint:

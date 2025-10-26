@@ -83,14 +83,14 @@ jobs:
     - name: Update Helm chart values
       run: |
         IMAGE_TAG=${{ needs.build-and-publish-image.outputs.image_tag }}
-        yq -i ".image.tag = \"$IMAGE_TAG\"" ./charts/desec-webhook/values.yaml
-        yq -i ".version = \"$IMAGE_TAG\"" ./charts/desec-webhook/Chart.yaml
-        yq -i ".appVersion = \"$IMAGE_TAG\"" ./charts/desec-webhook/Chart.yaml
+        yq -i ".image.tag = \"$IMAGE_TAG\"" ./deploy/desec-webhook/values.yaml
+        yq -i ".version = \"$IMAGE_TAG\"" ./deploy/desec-webhook/Chart.yaml
+        yq -i ".appVersion = \"$IMAGE_TAG\"" ./deploy/desec-webhook/Chart.yaml
         echo "Updated values.yaml:"
-        cat ./charts/desec-webhook/values.yaml
+        cat ./deploy/desec-webhook/values.yaml
         echo "---"
         echo "Updated Chart.yaml:"
-        cat ./charts/desec-webhook/Chart.yaml
+        cat ./deploy/desec-webhook/Chart.yaml
 
     # 4. Set up Helm
     - name: Set up Helm

@@ -1,0 +1,22 @@
+{{- if .Values.clusterIssuer.production.create -}}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: {{ include "cert-manager-webhook-desec.fullname" . }}-prod-private-key
+    email: {{ .Values.clusterIssuer.email }}
+    solvers:
+    - dns01:
+        webhook:
+          groupName: {{ .Values.groupName }}
+          solverName: desec-solver
+          config:
+            verbose: {{ .Values.clusterIssuer.verbose }}
+            apiTokenRef:
+              name: {{ include "cert-manager-webhook-desec.secretName" . }}
+              key: token
+{{- end -}}

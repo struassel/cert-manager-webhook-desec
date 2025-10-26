@@ -4,11 +4,11 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: {{ include "desec-webhook.selfSignedIssuer" . }}
+  name: {{ include "cert-manager-webhook-desec.selfSignedIssuer" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -20,19 +20,19 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "desec-webhook.rootCACertificate" . }}
+  name: {{ include "cert-manager-webhook-desec.rootCACertificate" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  secretName: {{ include "desec-webhook.rootCACertificate" . }}
+  secretName: {{ include "cert-manager-webhook-desec.rootCACertificate" . }}
   duration: 43800h # 5y
   issuerRef:
-    name: {{ include "desec-webhook.selfSignedIssuer" . }}
-  commonName: "ca.desec-webhook.cert-manager"
+    name: {{ include "cert-manager-webhook-desec.selfSignedIssuer" . }}
+  commonName: "ca.cert-manager-webhook-desec.cert-manager"
   isCA: true
 
 ---
@@ -41,16 +41,16 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: {{ include "desec-webhook.rootCAIssuer" . }}
+  name: {{ include "cert-manager-webhook-desec.rootCAIssuer" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   ca:
-    secretName: {{ include "desec-webhook.rootCACertificate" . }}
+    secretName: {{ include "cert-manager-webhook-desec.rootCACertificate" . }}
 
 ---
 
@@ -58,19 +58,19 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "desec-webhook.servingCertificate" . }}
+  name: {{ include "cert-manager-webhook-desec.servingCertificate" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  secretName: {{ include "desec-webhook.servingCertificate" . }}
+  secretName: {{ include "cert-manager-webhook-desec.servingCertificate" . }}
   duration: 8760h # 1y
   issuerRef:
-    name: {{ include "desec-webhook.rootCAIssuer" . }}
+    name: {{ include "cert-manager-webhook-desec.rootCAIssuer" . }}
   dnsNames:
-  - {{ include "desec-webhook.fullname" . }}
-  - {{ include "desec-webhook.fullname" . }}.{{ .Release.Namespace }}
-  - {{ include "desec-webhook.fullname" . }}.{{ .Release.Namespace }}.svc
+  - {{ include "cert-manager-webhook-desec.fullname" . }}
+  - {{ include "cert-manager-webhook-desec.fullname" . }}.{{ .Release.Namespace }}
+  - {{ include "cert-manager-webhook-desec.fullname" . }}.{{ .Release.Namespace }}.svc

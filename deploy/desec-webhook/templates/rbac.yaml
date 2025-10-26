@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 ---
@@ -15,11 +15,11 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}:webhook-authentication-reader
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:webhook-authentication-reader
   namespace: kube-system
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -29,7 +29,7 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "desec-webhook.fullname" . }}
+    name: {{ include "cert-manager-webhook-desec.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # apiserver gets the auth-delegator role to delegate auth decisions to
@@ -37,10 +37,10 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}:auth-delegator
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:auth-delegator
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -50,17 +50,17 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "desec-webhook.fullname" . }}
+    name: {{ include "cert-manager-webhook-desec.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}:domain-solver
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:domain-solver
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
@@ -74,18 +74,59 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}:domain-solver
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:domain-solver
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "desec-webhook.fullname" . }}:domain-solver
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:domain-solver
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: {{ .Values.certManager.serviceAccountName }}
     namespace: {{ .Values.certManager.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:secret-reader
+  namespace: {{ .Values.certManager.namespace | quote }}
+  labels:
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+- apiGroups: 
+    - ""
+  resources: 
+    - "secrets"
+  resourceNames: 
+    - "{{ include "cert-manager-webhook-desec.secretName" . }}"
+  verbs: 
+    - "get"
+    - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:secret-reader
+  namespace: {{ .Values.certManager.namespace | quote }}
+  labels:
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}:secret-reader
+subjects:
+ - apiGroup: ""
+   kind: ServiceAccount
+   name: {{ include "cert-manager-webhook-desec.fullname" . }}
+   namespace: {{ .Values.certManager.namespace | quote }}

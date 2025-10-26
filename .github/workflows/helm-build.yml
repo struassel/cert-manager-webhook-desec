@@ -5,7 +5,7 @@ on:
     branches:
     - '**'
     paths:
-    - 'charts/**'
+    - 'deploy/**'
   pull_request:
     branches:
     - '**'
@@ -33,8 +33,8 @@ jobs:
 
     - name: Helm linter
       run: |
-        helm lint charts/**
+        helm lint deploy/**
 
     - name: Build helm package
       run: |
-        helm package charts/**
+        helm package deploy/**

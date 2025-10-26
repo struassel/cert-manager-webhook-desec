@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "desec-webhook.fullname" . }}
+  name: {{ include "cert-manager-webhook-desec.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "desec-webhook.name" . }}
-    chart: {{ include "desec-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
+    chart: {{ include "cert-manager-webhook-desec.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -16,5 +16,5 @@ spec:
       protocol: TCP
       name: https
   selector:
-    app: {{ include "desec-webhook.name" . }}
+    app: {{ include "cert-manager-webhook-desec.name" . }}
     release: {{ .Release.Name }}

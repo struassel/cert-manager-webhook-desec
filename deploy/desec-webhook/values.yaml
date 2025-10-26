@@ -8,19 +8,35 @@
 # The name will need to be referenced in each Issuer's `webhook` stanza to
 # inform cert-manager of where to send ChallengePayload resources in order to
 # solve the DNS01 challenge.
-groupName: acme.mycompany.com
+groupName: dns01.cert-manager.dedyn.io
 
 certManager:
   namespace: cert-manager
   serviceAccountName: cert-manager
 
 image:
-  repository: mycompany/webhook-image
-  tag: latest
+  repository: ghcr.io/struassel/cert-manager-webhook-desec
+  tag: 0.0.0
   pullPolicy: IfNotPresent
+  # pullSecret: ""
+
+replicaCount: 1
+
+secret: {}
+  #If not provided, the secret must already exist with the defined name and a key 'token' containing the token
+  #token: ""
+  #name: ""
 
 nameOverride: ""
 fullnameOverride: ""
+
+clusterIssuer:
+  email: name@example.com
+  production:
+    create: true
+  staging:
+    create: true
+  verbose: true
 
 service:
   type: ClusterIP
