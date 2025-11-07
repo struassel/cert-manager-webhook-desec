@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/cert-manager/cert-manager v1.19.1
-	github.com/go-acme/lego/v4 v4.28.0
+	github.com/go-acme/lego/v4 v4.28.1
 	github.com/nrdcg/desec v0.11.1
 	github.com/pkg/errors v0.9.1
 	k8s.io/apiextensions-apiserver v0.34.1
