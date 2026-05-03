@@ -26,6 +26,7 @@ func TestRunsSuite(t *testing.T) {
 
 	fixture := acmetest.NewFixture(desec.NewDesecDnsSolver(),
 		acmetest.SetResolvedZone(zone),
+		acmetest.SetResolvedFQDN(zone+"."),
 		//acmetest.SetDNSName(domain),
 		//acmetest.SetResolvedFQDN("_acme-challenge."+zone),
 		acmetest.SetAllowAmbientCredentials(false),
