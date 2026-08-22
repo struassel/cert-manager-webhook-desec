@@ -14,7 +14,7 @@ jobs:
       contents: write
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
     - name: List dependencies
       uses: ./.github/actions/go-dependencies
 
@@ -33,7 +33,7 @@ jobs:
     steps:
     # 1. Check out the repository code
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     # 2. Extract metadata (tags, labels) for Docker
     - name: Extract Docker metadata
@@ -70,7 +70,7 @@ jobs:
     steps:
     # 1. Check out the repository code
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0 # Fetches all history for git actions
 
