@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   cert-manager-webhook-desec:
   - apiVersion: v1
+    appVersion: 0.0.1
+    created: "2026-09-04T22:24:08.423381715Z"
+    description: A Helm chart for installing desec webhook for cert-manager
+    digest: a5c595c9c58f7c83d7413cb1486603ac2a33fad7752733daf589744781aecf48
+    keywords:
+    - cert-manager
+    - webhook
+    - letsencrypt
+    - tls
+    - desec
+    name: cert-manager-webhook-desec
+    urls:
+    - cert-manager-webhook-desec-0.0.1.tgz
+    version: 0.0.1
+  - apiVersion: v1
     appVersion: 0.0.1-rc2
     created: "2025-11-01T16:49:38.402103247Z"
     description: A Helm chart for installing desec webhook for cert-manager
@@ -31,4 +46,4 @@ entries:
     urls:
     - cert-manager-webhook-desec-0.0.1-rc1.tgz
     version: 0.0.1-rc1
-generated: "2025-11-01T16:49:38.402114246Z"
+generated: "2026-09-04T22:24:08.423396587Z"
