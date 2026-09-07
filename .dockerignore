@@ -6,14 +6,6 @@
 !go.sum
 !**/*.go
 
-# 3. Re-include all directories (so Docker can traverse them to find .go files)
+# 3. Re-include directories (so Docker can traverse them to find .go files)
 # This is the magic part! It un-ignores directories, but not the files *inside* them.
-!*/
-
-# 4. Re-ignore specific directories you definitely don't want
-# (like .git, which contains many files that aren't .go)
-.git/
-.vscode/
-.github/
-charts/
-testdata/
+!desec/
