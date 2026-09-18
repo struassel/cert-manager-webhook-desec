@@ -16,7 +16,7 @@ certManager:
 
 image:
   repository: ghcr.io/struassel/cert-manager-webhook-desec
-  tag: 0.0.0
+  tag: 0.0.1@sha256:58e31a9b1c6789291437b259f983e3653a0284b2a87a4a7b375c3c83e847b285
   pullPolicy: IfNotPresent
   # pullSecret: ""
 
