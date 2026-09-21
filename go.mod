@@ -3,7 +3,7 @@ module github.com/struassel/cert-manager-webhook-desec
 go 1.26.2
 
 require (
-	github.com/cert-manager/cert-manager v1.21.1
+	github.com/cert-manager/cert-manager v1.21.2
 	github.com/go-acme/lego/v4 v4.35.2
 	github.com/nrdcg/desec v0.11.2
 	github.com/pkg/errors v0.9.1
