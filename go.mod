@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	github.com/cert-manager/cert-manager v1.21.2
 	github.com/go-acme/lego/v4 v4.35.2
-	github.com/nrdcg/desec v0.11.2
+	github.com/nrdcg/desec v0.11.3
 	github.com/pkg/errors v0.9.1
 	k8s.io/apiextensions-apiserver v0.37.1
 	k8s.io/apimachinery v0.37.1
@@ -88,7 +88,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
 	golang.org/x/mod v0.41.0 // indirect
