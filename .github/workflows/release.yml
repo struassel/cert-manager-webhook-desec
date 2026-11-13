@@ -76,7 +76,7 @@ jobs:
 
     # 2. Install yq to edit YAML files
     - name: Install yq
-      uses: mikefarah/yq@504fc38780cc46be8444ea1b72fb55919fc0bfb0 # v4.54.1
+      uses: mikefarah/yq@f2944b823f84906a127dbd29e4c2a3e60c4e550e # v4.54.3
 
     # 3. Update the values.yaml with the new image tag and chart version
     # It takes the version from the output of the build-and-publish-image job
@@ -106,7 +106,7 @@ jobs:
 
     # 6. Run chart-releaser
     - name: Run chart-releaser
-      uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
+      uses: helm/chart-releaser-action@92c6b97fa9f664492a2592e0d1d80bc6bf378957 # v1.9.0
       with:
         packages_with_index: true
       env:
