@@ -6,7 +6,9 @@
     ":prNotPending",
     "local>cert-manager/renovate-config"
   ],
-  "dependencyDashboard": true,
+  "dependencyDashboard": {
+    "enabled": true
+  },
   "schedule": [
     "after 6am and before 9am on monday, wednesday and friday"
   ],
